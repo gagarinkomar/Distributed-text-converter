@@ -7,12 +7,11 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Request, Upload
+from .models import Request, File, Upload
 from tasks import task1, task2
 
 from django.views.generic.edit import FormView
 from .forms import FileFieldForm
-from .models import UploadedImage
 from django.core.files.storage import FileSystemStorage
 
 
@@ -70,7 +69,6 @@ def download_file(file_name):
         print(f"Ошибка загрузки файла: {e}")
         return None
 
-
 def get_uploaded_file(request, file_id=1):
     upload = get_object_or_404(Upload, id=file_id)
     file_content = download_file(upload.file.name)
@@ -90,15 +88,19 @@ class FileFieldFormView(FormView):
     template_name = "upload_images.html"  # Replace with your template.
     success_url = "/"  # Replace with your URL or reverse().
 
-def form_valid(self, form):
-    files = form.cleaned_data["file_field"]
-    for file in files:
-        if file.name.endswith('.jpg') or file.name.endswith('.png'):
-            file_url = handle_uploaded_file(file)
-            # UploadedImage.objects.create(image=file_url)
-        else:
-            print("Not an image")
-    return super().form_valid(form)
+    def form_valid(self, form):
+        files = form.cleaned_data["file_field"]
+        request = Request.create_request()
+        for file in files:
+            if file.name.endswith('.jpg') or file.name.endswith('.png'):
+                file_object = File.create_file(request, file.name)
+                file.name = str(file_object.id) + "." + file.name.split('.')[-1]
+                upload = Upload(file=file)
+                upload.save()
+            else:
+                print("Not an image")
+        self.success_url = f"/request/{str(request.id)}"
+        return super().form_valid(form)
 
-def form_invalid(self, form):
-    return self.render_to_response(self.get_context_data(form=form))
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
