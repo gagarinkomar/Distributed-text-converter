@@ -1,7 +1,9 @@
+from django.shortcuts import render, get_object_or_404
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Request
+from .models import Request, Upload
 from tasks import task1
 
 
@@ -25,3 +27,16 @@ class TestingView(APIView):
             
         
         return Response({"success": f'Task with number {task_number} started'})
+
+
+
+def image_upload(request):
+    if request.method == 'POST':
+        image_file = request.FILES['image_file']
+        upload = Upload(file=image_file)
+        upload.save()
+        image_url = upload.file.url
+        return render(request, 'upload.html', {
+            'image_url': image_url
+        })
+    return render(request, 'upload.html')
