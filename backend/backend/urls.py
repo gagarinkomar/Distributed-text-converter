@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from requests.views import image_upload
+from requests.views import image_upload, get_uploaded_file
 
 urlpatterns = [
     path('', image_upload, name='upload'),
+    path('lol/', get_uploaded_file),
     path('admin/', admin.site.urls),
     path('api/', include('requests.urls')),
 ]
