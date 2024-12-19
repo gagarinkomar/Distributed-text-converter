@@ -1,7 +1,6 @@
 import boto3
 from django.conf import settings
 
-
 class ImageTasking:
     def __init__(self, bucket_name=None):
         self.s3_client = boto3.client(
@@ -15,11 +14,18 @@ class ImageTasking:
     def upload_to_s3(self, file_name, file_content):
         self.s3_client.put_object(
             Bucket=self.bucket_name,
-            Key=file_name,
+            Key=settings.PUBLIC_EDITED_LOCATION + '/' + file_name,
             Body=file_content,
-            ContentType="image/jpeg",
+            ContentType="image/jpg",
         )
 
     def download_from_s3(self, file_name):
-        response = self.s3_client.get_object(Bucket=self.bucket_name, Key=file_name)
-        return response['Body'].read()
+        try:
+            response = self.s3_client.get_object(
+                Bucket=self.bucket_name,
+                Key=settings.PUBLIC_MEDIA_LOCATION + '/' + file_name + '.jpg'
+            )
+            return response['Body'].read()
+        except Exception as e:
+            print(f"Ошибка загрузки файла: {e}")
+        return None
