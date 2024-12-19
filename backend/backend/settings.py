@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'requests'
+    'rest_framework',
+    'requests',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -125,3 +128,44 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_IMPORTS = ['tasks']
+
+# AWS_ACCESS_KEY_ID = 'minioadmin'
+# AWS_SECRET_ACCESS_KEY = 'minioadmin'
+# AWS_STORAGE_BUCKET_NAME = 'media'
+# AWS_S3_ENDPOINT_URL = 'http://minio:9000'
+# AWS_S3_USE_SSL = False
+# AWS_S3_VERIFY = False
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
+
+
+
+# STATIC_URL = "/static/"
+
+
+# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# AWS_ACCESS_KEY_ID = 'minioadmin'
+# AWS_SECRET_ACCESS_KEY = 'minioadmin'
+# AWS_STORAGE_BUCKET_NAME = 'media'
+# AWS_S3_ENDPOINT_URL = "http://minio:9000"
+
+
+
+# aws settings
+AWS_ACCESS_KEY_ID = 'minioadmin'
+AWS_SECRET_ACCESS_KEY = 'minioadmin'
+AWS_STORAGE_BUCKET_NAME = 'files'
+AWS_DEFAULT_ACL = None
+AWS_S3_ENDPOINT_URL = "http://minio:9000"
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}'
+# s3 public media settings
+PUBLIC_MEDIA_LOCATION = 'media'
+MEDIA_URL = f'{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+DEFAULT_FILE_STORAGE = 'requests.storage_backends.PublicMediaStorage'
