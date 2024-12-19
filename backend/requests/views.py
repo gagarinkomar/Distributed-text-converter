@@ -85,15 +85,20 @@ class FileFieldFormView(FormView):
     template_name = "upload_images.html"  # Replace with your template.
     success_url = "/"  # Replace with your URL or reverse().
 
-def form_valid(self, form):
-    files = form.cleaned_data["file_field"]
-    for file in files:
-        if file.name.endswith('.jpg') or file.name.endswith('.png'):
-            file_url = handle_uploaded_file(file)
-            # UploadedImage.objects.create(image=file_url)
-        else:
-            print("Not an image")
-    return super().form_valid(form)
+    def form_valid(self, form):
+        files = form.cleaned_data["file_field"]
+        request = Request.create_request()
+        for file in files:
+            if file.name.endswith('.jpg') or file.name.endswith('.png'):
+                file.name = str(request.id) + "+" + file.name
 
-def form_invalid(self, form):
-    return self.render_to_response(self.get_context_data(form=form))
+                print(file)
+                file_url = handle_uploaded_file(file)
+                UploadedImage.objects.create(image=file_url)
+            else:
+                print("Not an image")
+        self.success_url = f"request/{str(request.id)}"
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
