@@ -28,7 +28,8 @@ class TestingView(APIView):
 
 
 def get_task_status(request_id):
-    return True
+    return Request.is_request_done(request_id)
+
 
 
 def request_status(request, request_id):
@@ -36,9 +37,18 @@ def request_status(request, request_id):
 
 
 def check_status(request, request_id):
-    status = get_task_status(request_id)
+    # Логика проверки статуса задачи по request_id
+    status = get_task_status(request_id)  # Например, 'pending' или 'ready'
+    # status = True
     if status:
-        return JsonResponse({'status': 'ready', 'link': f'/media/{request_id}_result.zip'})
+        task = Request.get_request(request_id)
+        try:
+            url = task.get_resulting_link()
+            print(url)
+            return JsonResponse({'status': 'ready', 'link': f'{url}'})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'pending'})
     return JsonResponse({'status': 'pending'})
 
 
@@ -51,7 +61,7 @@ class FileFieldFormView(FormView):
         files = form.cleaned_data["file_field"]
         request = Request.create_request()
         for file in files:
-            if file.name.endswith('.jpg') or file.name.endswith('.png'):
+            if file.name.endswith('.jpg') or file.name.endswith('.jpeg') or file.name.endswith('.png'):
                 UploadedFile.create_file(request, file.name, file)
             else:
                 print("Not an image")

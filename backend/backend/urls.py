@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 
 from requests.views import FileFieldFormView, request_status, check_status
 
+
 urlpatterns = [
     path('', FileFieldFormView.as_view()),
     path('admin/', admin.site.urls),
