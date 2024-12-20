@@ -19,6 +19,11 @@ class Request(models.Model):
     def create_request(cls):
         return cls.objects.create()
 
+    @classmethod
+    def is_request_done(cls, request_id):
+        request = cls.objects.get(id=request_id)
+        return not request is None and request.status == RequestStatus.DONE
+
     def __str__(self):
         return str(self.id) + " — " + str(self.status)
 
