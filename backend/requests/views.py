@@ -27,7 +27,7 @@ class TestingView(APIView):
         return Response({"requests": [str(request) for request in requests]})
 
     def post(self, request):
-        file_id=request.data.get('file_id')
+        file_id = request.data.get('file_id')
         task2.delay(file_id)
 
         return Response({"success": f'Task with number {123123} started'})
@@ -90,8 +90,8 @@ def request_status(request, request_id):
 
 def check_status(request, request_id):
     # Логика проверки статуса задачи по request_id
-    # status = get_task_status(request_id)  # Например, 'pending' или 'ready'
-    status = True
+    status = get_task_status(request_id)  # Например, 'pending' или 'ready'
+    # status = True
     if status:
         task = Request.get_request(request_id)
         try:

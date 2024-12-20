@@ -145,7 +145,6 @@ CELERY_IMPORTS = ['tasks']
 # MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
 
 
-
 # STATIC_URL = "/static/"
 
 
@@ -155,7 +154,6 @@ CELERY_IMPORTS = ['tasks']
 # AWS_SECRET_ACCESS_KEY = 'minioadmin'
 # AWS_STORAGE_BUCKET_NAME = 'media'
 # AWS_S3_ENDPOINT_URL = "http://minio:9000"
-
 
 
 # aws settings

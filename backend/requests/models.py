@@ -1,13 +1,11 @@
-from django.db import models
 import uuid
-
-from requests.storage_backends import UploadedStorage, EditedStorage, ResultStorage
+from django.db import models
 from django.conf import settings
-
-RESULT_STORAGE = ResultStorage()
-
 from django.core.files.base import ContentFile
 
+from requests.storage_backends import UploadedStorage, EditedStorage, ResultStorage
+
+RESULT_STORAGE = ResultStorage()
 
 
 class RequestStatus(models.TextChoices):
@@ -82,7 +80,7 @@ class UploadedFile(File):
     uploaded_name = models.CharField(max_length=100)
 
     file = models.FileField(storage=UploadedStorage())
-    
+
     def get_file_data(self):
         with self.file.file.open('rb') as f:
             return f.read()
@@ -91,9 +89,8 @@ class UploadedFile(File):
     def create_file(cls, request: Request, uploaded_name: str, file):
         id = uuid.uuid4()
         file.name = str(id) + "." + uploaded_name.split('.')[-1]
-        
-        return cls.objects.create(id=id, request=request, uploaded_name=uploaded_name, file=file)
 
+        return cls.objects.create(id=id, request=request, uploaded_name=uploaded_name, file=file)
 
 
 class EditedFile(File):
@@ -102,5 +99,5 @@ class EditedFile(File):
     @classmethod
     def create_file(cls, request: Request, name: str, data):
         file = ContentFile(data, name=name)
-        
+
         return cls.objects.create(request=request, file=file)
