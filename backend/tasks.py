@@ -13,8 +13,6 @@ def task1(number):
     res = Request.objects.create(test_field=number)
     return True
 
-# Изменить изображение
-
 
 @app.task
 def task_image_edit(file_id):
