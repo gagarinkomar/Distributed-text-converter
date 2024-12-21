@@ -7,11 +7,28 @@
 
 ## Инструкция по запуску проекта
 
+Вместо `example.com` ваш домен
+
 ```bash
 git clone https://github.com/gagarinkomar/distributed-text-converter.git
 cd distributed-text-converter
+
+sudo certbot certonly --standalone -d example.com
+sed -i 's/yourdomain\.com/example.com/g' nginx/nginx.conf
+
 cp .env.example .env
+```
+
+Настраиваете переменные в .env
+
+```
 docker compose up --build -d
+```
+
+Если хотите запускать без https:
+
+```
+cp nginx/nginx.conf.http_only nginx/nginx.conf
 ```
 
 ## Сценарий использования
