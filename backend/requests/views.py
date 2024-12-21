@@ -58,6 +58,7 @@ class FileFieldFormView(FormView):
         res = chord(tasks)(task_to_zip.s())
             
         self.success_url = f"/request/{str(request.id)}"
+        
         return super().form_valid(form)
 
     def form_invalid(self, form):

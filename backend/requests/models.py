@@ -64,11 +64,19 @@ class Request(models.Model):
         self.file = ContentFile(data, name=name)
         self.save()
         
-    def delete_file(self):
-        storage = self.file.storage
-        if storage.exists(self.file.name):
-            storage.delete(self.file.name)
-        super().delete()
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete(save=False)
+            
+        uploaded_files = UploadedFile.objects.filter(request=self)
+        for uploaded_file in uploaded_files:
+            uploaded_file.delete()
+            
+        edited_files = EditedFile.objects.filter(request=self)
+        for edited_file in edited_files:
+            edited_file.delete()
+        
+        super().delete(*args, **kwargs)
     
     def update_status_done(self):
         self.status = RequestStatus.DONE
@@ -86,11 +94,10 @@ class File(models.Model):
     def get_by_id(cls, id):
         return cls.objects.get(id=id)
     
-    def delete_file(self):
-        storage = self.file.storage
-        if storage.exists(self.file.name):
-            storage.delete(self.file.name)
-        super().delete()
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete(save=False)
+        super().delete(*args, **kwargs)
 
     class Meta:
         abstract = True
