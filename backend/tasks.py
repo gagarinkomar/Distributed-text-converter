@@ -11,27 +11,41 @@ from backend.celery import app
 
 @app.task
 def task_image_edit(file_id):
-    image = UploadedFile.get_by_id(file_id)
+    try:
+        image = UploadedFile.get_by_id(file_id)
 
-    image_handler = ImageHandler()
+        image_handler = ImageHandler()
+
+        edited_image = image_handler.edit(image.get_file_data())
+
+        file = EditedFile.create_file(image.request, image.uploaded_name, edited_image)
+    except Exception:
+        return file_id, False
     
-    edited_image = image_handler.edit(image.get_file_data())
+    return file.id, True
 
-    file = EditedFile.create_file(image.request, image.uploaded_name, edited_image)
-
-    return file.id
 
 @app.task
 def task_to_zip(file_ids):
-    
+    example_id = None
+
     buffer_archive = BytesIO()
     with zipfile.ZipFile(buffer_archive, 'w') as archive:
-        for file_id in file_ids:
+        for file_id, is_edited in file_ids:
+            if not is_edited:
+                continue
+
+            example_id = file_id
             file = EditedFile.get_by_id(file_id)
             buffer_file = file.get_file_data()
             archive.writestr(file.file.name, buffer_file)
     buffer_archive.seek(0)
-    
+
+    if example_id is None:
+        request = UploadedFile.get_by_id(file_ids[0][0]).request
+        request.delete()
+        return False
+
     file_example = EditedFile.get_by_id(file_ids[0])
     
     file_example.request.update_file(str(file_example.request.id) + '.zip', buffer_archive.getvalue())
@@ -40,6 +54,7 @@ def task_to_zip(file_ids):
     file_example.request.update_expiration_date()
 
     return True
+
 
 @app.task
 def task_clear_requests():
