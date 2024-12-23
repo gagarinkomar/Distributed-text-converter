@@ -63,4 +63,5 @@ cp nginx/nginx.conf.http_only nginx/nginx.conf
 независимо от контроллера
 
 ## Схема сетевого взаимодействия
+Взаимодействие пользователя с приложением управляется nginx
 ![Схема](images/schema_selection.png)
